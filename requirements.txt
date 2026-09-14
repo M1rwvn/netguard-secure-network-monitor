@@ -1,0 +1,5 @@
+flask>=3.0
+flask-limiter>=3.5
+bcrypt>=4.1
+cryptography>=42.0
+scapy>=2.5

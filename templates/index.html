@@ -1,0 +1,2512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NetGuard SOC Dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #05070d;
+  --surface: #0c1320;
+  --surface2: #111a2b;
+  --surface3: #162236;
+  --line: rgba(148, 163, 184, .14);
+  --line2: rgba(148, 163, 184, .24);
+  --text: #e5edf7;
+  --soft: #a6b3c4;
+  --muted: #64748b;
+  --green: #35d07f;
+  --red: #ff5d67;
+  --amber: #f5b544;
+  --blue: #61a8ff;
+  --cyan: #42d4ff;
+  --shadow: 0 18px 60px rgba(0, 0, 0, .32);
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 12% -10%, rgba(66, 212, 255, .12), transparent 35%),
+    radial-gradient(circle at 90% 8%, rgba(53, 208, 127, .10), transparent 30%),
+    linear-gradient(135deg, var(--bg), #03050a 58%, #07111d);
+  color: var(--text);
+  font-family: var(--sans);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+.hide {
+  display: none !important;
+}
+
+.mono {
+  font-family: var(--mono);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.c-green { color: var(--green); }
+.c-red { color: var(--red); }
+.c-blue { color: var(--blue); }
+.c-amber { color: var(--amber); }
+.c-cyan { color: var(--cyan); }
+
+/* LOGIN */
+#login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-card {
+  width: 430px;
+  max-width: 100%;
+  border: 1px solid var(--line2);
+  background: linear-gradient(180deg, rgba(17,26,43,.94), rgba(12,19,32,.86));
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  padding: 34px;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-card::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: radial-gradient(circle at 30% 0%, rgba(53,208,127,.18), transparent 32%);
+  pointer-events: none;
+}
+
+.brand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(53,208,127,.2), rgba(66,212,255,.12));
+  border: 1px solid rgba(53,208,127,.35);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 40px rgba(53,208,127,.15);
+}
+
+.brand-title {
+  font-weight: 800;
+  letter-spacing: .3px;
+}
+
+.brand-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.login-title {
+  position: relative;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.login-sub {
+  position: relative;
+  color: var(--soft);
+  font-size: 14px;
+  margin: 8px 0 26px;
+  line-height: 1.6;
+}
+
+.field {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.field label,
+.lbl {
+  display: block;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.field input,
+.fld input,
+.fld select {
+  width: 100%;
+  background: rgba(5,7,13,.75);
+  border: 1px solid var(--line2);
+  border-radius: 14px;
+  color: var(--text);
+  outline: none;
+  padding: 13px 14px;
+  font-family: var(--mono);
+  font-size: 13px;
+  transition: .16s;
+}
+
+.field input:focus,
+.fld input:focus,
+.fld select:focus {
+  border-color: rgba(53,208,127,.75);
+  box-shadow: 0 0 0 4px rgba(53,208,127,.08);
+}
+
+.err-msg {
+  min-height: 18px;
+  color: var(--red);
+  font-family: var(--mono);
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+/* BUTTONS */
+.primary {
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--green), #86efac);
+  color: #04110a;
+  font-weight: 800;
+  padding: 12px 18px;
+  box-shadow: 0 10px 30px rgba(53,208,127,.16);
+  transition: .16s;
+}
+
+.primary:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.primary:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.ghost,
+.danger,
+.warn,
+.bluebtn {
+  border: 1px solid var(--line2);
+  background: rgba(17,26,43,.72);
+  color: var(--soft);
+  border-radius: 12px;
+  padding: 9px 13px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  transition: .16s;
+}
+
+.ghost:hover {
+  border-color: var(--blue);
+  color: var(--text);
+}
+
+.danger {
+  border-color: rgba(255,93,103,.35);
+  color: var(--red);
+}
+
+.danger:hover {
+  background: rgba(255,93,103,.08);
+}
+
+.warn {
+  border-color: rgba(245,181,68,.35);
+  color: var(--amber);
+}
+
+.bluebtn {
+  border-color: rgba(97,168,255,.4);
+  color: var(--blue);
+}
+
+/* APP SHELL */
+#app {
+  display: none;
+  min-height: 100vh;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  background: rgba(8,13,22,.82);
+  backdrop-filter: blur(18px);
+  border-right: 1px solid var(--line);
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.side-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px 20px;
+}
+
+.side-brand .brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+}
+
+.side-brand .brand-title {
+  font-size: 17px;
+}
+
+.nav-section {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 18px 12px 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 14px;
+  color: var(--soft);
+  font-weight: 650;
+  font-size: 14px;
+  margin: 3px 0;
+  transition: .14s;
+}
+
+.nav-item:hover {
+  background: rgba(148,163,184,.08);
+  color: var(--text);
+}
+
+.nav-item.active {
+  background: linear-gradient(135deg, rgba(53,208,127,.16), rgba(66,212,255,.08));
+  color: #fff;
+  border: 1px solid rgba(53,208,127,.20);
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-ico {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: rgba(148,163,184,.10);
+  font-size: 13px;
+}
+
+.side-foot {
+  margin-top: auto;
+  border: 1px solid var(--line);
+  background: rgba(17,26,43,.65);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.status-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  margin-bottom: 8px;
+  color: var(--muted);
+}
+
+.status-line b {
+  color: var(--soft);
+  font-weight: 700;
+}
+
+.main {
+  min-width: 0;
+}
+
+.topbar {
+  height: 72px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(5,7,13,.72);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+}
+
+.top-title {
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.top-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line2);
+  background: rgba(17,26,43,.70);
+  border-radius: 999px;
+  padding: 7px 11px;
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.chip::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--green);
+  box-shadow: 0 0 12px currentColor;
+}
+
+.chip.viewer::before {
+  background: var(--blue);
+}
+
+.content {
+  padding: 28px 30px 42px;
+}
+
+.panel {
+  display: none;
+}
+
+.panel.on {
+  display: block;
+}
+
+/* CARDS / GRIDS */
+.card {
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(17,26,43,.78), rgba(12,19,32,.72));
+  border-radius: 22px;
+  box-shadow: 0 10px 40px rgba(0,0,0,.16);
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+.card-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.card-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(130px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.stat {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: rgba(17,26,43,.65);
+  border-radius: 18px;
+  padding: 17px;
+}
+
+.stat::after {
+  content: "";
+  position: absolute;
+  right: -28px;
+  top: -28px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(97,168,255,.08);
+}
+
+.stat-lbl {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.stat-val {
+  font-family: var(--mono);
+  font-size: 29px;
+  font-weight: 800;
+  margin-top: 8px;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.fld {
+  flex: 1;
+  min-width: 180px;
+}
+
+.mini-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.progress {
+  height: 5px;
+  background: rgba(148,163,184,.12);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 14px 0 8px;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--green), var(--cyan));
+  transition: width .16s;
+}
+
+.help {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.notice {
+  border: 1px solid rgba(245,181,68,.28);
+  background: rgba(245,181,68,.07);
+  color: var(--amber);
+  padding: 11px 13px;
+  border-radius: 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  margin-bottom: 14px;
+}
+
+/* TABLES */
+.table-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 12px;
+  min-width: 760px;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background: #101827;
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .9px;
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  z-index: 1;
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(148,163,184,.08);
+  vertical-align: middle;
+  color: #dbe7f6;
+}
+
+tr:hover td {
+  background: rgba(148,163,184,.035);
+}
+
+tr:last-child td {
+  border-bottom: 0;
+}
+
+.empty {
+  color: var(--muted);
+  padding: 22px 12px !important;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+/* BADGES */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 99px;
+  background: currentColor;
+}
+
+.b-low,
+.b-on {
+  background: rgba(53,208,127,.11);
+  color: var(--green);
+  border: 1px solid rgba(53,208,127,.2);
+}
+
+.b-medium {
+  background: rgba(245,181,68,.11);
+  color: var(--amber);
+  border: 1px solid rgba(245,181,68,.2);
+}
+
+.b-high,
+.b-off {
+  background: rgba(255,93,103,.11);
+  color: var(--red);
+  border: 1px solid rgba(255,93,103,.2);
+}
+
+.b-blue {
+  background: rgba(97,168,255,.11);
+  color: var(--blue);
+  border: 1px solid rgba(97,168,255,.2);
+}
+
+.riskbar {
+  width: 120px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(148,163,184,.14);
+  overflow: hidden;
+}
+
+.riskbar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--green), var(--amber), var(--red));
+}
+
+/* LOGS / RECS */
+.rec {
+  border: 1px solid var(--line);
+  background: rgba(5,7,13,.38);
+  border-radius: 14px;
+  padding: 13px;
+  color: var(--soft);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.log-row {
+  display: grid;
+  grid-template-columns: 90px 90px 1fr 100px;
+  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid rgba(148,163,184,.08);
+  padding: 10px 0;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.log-row:last-child {
+  border-bottom: 0;
+}
+
+/* TOAST / SPINNER */
+#toast {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  min-width: 260px;
+  max-width: 420px;
+  border: 1px solid var(--line2);
+  background: rgba(17,26,43,.95);
+  color: var(--green);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 13px 15px;
+  font-family: var(--mono);
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: .22s;
+  z-index: 999;
+}
+
+#toast.on {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.spinner {
+  width: 13px;
+  height: 13px;
+  display: inline-block;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.22);
+  border-top-color: var(--green);
+  animation: spin .7s linear infinite;
+  vertical-align: -2px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+/* EXTRA PROFESSIONAL UI */
+.toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.searchbox {
+  min-width: 260px;
+  flex: 1;
+  background: rgba(5,7,13,.75);
+  border: 1px solid var(--line2);
+  border-radius: 14px;
+  color: var(--text);
+  outline: none;
+  padding: 11px 13px;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.kpi-strip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.kpi-pill {
+  border: 1px solid var(--line);
+  background: rgba(5,7,13,.35);
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--soft);
+}
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  place-items: center;
+  background: rgba(0,0,0,.58);
+  backdrop-filter: blur(8px);
+  z-index: 998;
+  padding: 18px;
+}
+.modal.on { display: grid; }
+.modal-card {
+  width: min(760px, 100%);
+  max-height: 86vh;
+  overflow: auto;
+  border: 1px solid var(--line2);
+  background: linear-gradient(180deg, rgba(17,26,43,.98), rgba(12,19,32,.96));
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.detail-box {
+  border: 1px solid var(--line);
+  background: rgba(5,7,13,.36);
+  border-radius: 14px;
+  padding: 13px;
+}
+.detail-box small {
+  display: block;
+  color: var(--muted);
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  margin-bottom: 7px;
+}
+.detail-box b {
+  font-family: var(--mono);
+  color: var(--text);
+}
+@media (max-width: 720px) {
+  .detail-grid { grid-template-columns: 1fr; }
+  .searchbox { min-width: 100%; }
+}
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: relative;
+    height: auto;
+  }
+
+  .stats,
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    height: auto;
+    min-height: 72px;
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 18px;
+    gap: 12px;
+  }
+
+  .content {
+    padding: 18px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-mark">🛡️</div>
+      <div>
+        <div class="brand-title">NetGuard</div>
+        <div class="brand-sub">Secure Network Monitor</div>
+      </div>
+    </div>
+
+    <div class="login-title">Sign in</div>
+    <div class="login-sub">
+      Access the SOC dashboard, live packet monitor, ARP controls, and automated reports.
+    </div>
+
+    <div class="field">
+      <label>Username</label>
+      <input id="lu" type="text" autocomplete="off" placeholder="admin" />
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+      <input id="lp" type="password" placeholder="••••••••" />
+    </div>
+
+    <button class="primary" id="login-btn" style="width:100%" onclick="doLogin()">Sign in</button>
+    <div class="err-msg" id="lerr"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="side-brand">
+        <div class="brand-mark">🛡️</div>
+        <div>
+          <div class="brand-title">NetGuard</div>
+          <div class="brand-sub">SOC Console</div>
+        </div>
+      </div>
+
+      <div class="nav-section">Operations</div>
+
+      <div class="nav-item active" data-panel="dashboard" onclick="nav(this)">
+        <div class="nav-left"><span class="nav-ico">📊</span> Dashboard</div>
+      </div>
+
+      <div class="nav-item" data-panel="devices" onclick="nav(this)">
+        <div class="nav-left"><span class="nav-ico">🖧</span> Devices</div>
+        <span id="nav-dev-count" class="muted mono">—</span>
+      </div>
+
+      <div class="nav-item" data-panel="packets" onclick="nav(this)">
+        <div class="nav-left"><span class="nav-ico">📡</span> Packets</div>
+        <span id="nav-pkt-count" class="muted mono">0</span>
+      </div>
+
+      <div class="nav-item" data-panel="soc" onclick="nav(this)">
+        <div class="nav-left"><span class="nav-ico">🧠</span> SOC Profiles</div>
+        <span id="nav-soc-count" class="muted mono">0</span>
+      </div>
+
+      <div class="nav-section">Governance</div>
+
+      <div class="nav-item" data-panel="reports" onclick="nav(this)">
+        <div class="nav-left"><span class="nav-ico">📄</span> Reports</div>
+      </div>
+
+      <div class="nav-item admin-only" data-panel="users" onclick="nav(this)">
+        <div class="nav-left"><span class="nav-ico">👥</span> Users</div>
+        <span id="nav-user-count" class="muted mono">—</span>
+      </div>
+
+      <div class="nav-item" data-panel="logs" onclick="nav(this)">
+        <div class="nav-left"><span class="nav-ico">🧾</span> Audit Log</div>
+      </div>
+
+      <div class="side-foot">
+        <div class="status-line"><span>User</span><b id="side-user">—</b></div>
+        <div class="status-line"><span>Role</span><b id="side-role">—</b></div>
+        <div class="status-line"><span>Interface</span><b id="side-iface">—</b></div>
+        <div class="status-line"><span>Sniffer</span><b id="side-sniffer">—</b></div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <section class="main">
+      <header class="topbar">
+        <div>
+          <div class="top-title" id="top-title">Dashboard</div>
+          <div class="top-sub" id="top-sub">Security overview and live risk posture</div>
+        </div>
+
+        <div class="top-actions">
+          <span class="chip" id="role-chip">—</span>
+          <select class="ghost" id="auto-refresh" onchange="configureAutoRefresh()">
+            <option value="0">Auto refresh off</option>
+            <option value="6000" selected>Auto 6s</option>
+            <option value="15000">Auto 15s</option>
+            <option value="30000">Auto 30s</option>
+          </select>
+          <button class="ghost" onclick="refreshAll()">Refresh</button>
+          <button class="danger" onclick="doLogout()">Logout</button>
+        </div>
+      </header>
+
+      <main class="content">
+
+        <!-- DASHBOARD -->
+        <div class="panel on" id="panel-dashboard">
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-lbl">Captured Packets</div>
+              <div class="stat-val c-blue" id="dash-captured">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-lbl">High Risk</div>
+              <div class="stat-val c-red" id="dash-high">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-lbl">Medium Risk</div>
+              <div class="stat-val c-amber" id="dash-med">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-lbl">Traffic Volume</div>
+              <div class="stat-val c-green" id="dash-bytes">0 B</div>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="card">
+              <div class="card-hd">
+                <div>
+                  <div class="card-title">Top Risk Hosts</div>
+                  <div class="card-sub">Sorted by average risk score</div>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>IP</th>
+                      <th>Packets</th>
+                      <th>Risk</th>
+                      <th>Level</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dash-hosts">
+                    <tr><td colspan="4" class="empty">No profiles yet.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-hd">
+                <div>
+                  <div class="card-title">SOC Recommendations</div>
+                  <div class="card-sub" id="dash-sniffer">Waiting for sniffer status</div>
+                </div>
+              </div>
+              <div id="rec-list">
+                <div class="empty">No recommendations yet.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-hd">
+              <div>
+                <div class="card-title">Most Suspicious Recent Packets</div>
+                <div class="card-sub" id="dash-protos">Protocol breakdown will appear here</div>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Source</th>
+                    <th>Destination</th>
+                    <th>Protocol</th>
+                    <th>Risk</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-packets">
+                  <tr><td colspan="5" class="empty">No packets yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- DEVICES -->
+        <div class="panel" id="panel-devices">
+          <div id="viewer-note" class="notice" style="display:none">
+            Viewer role: scan and block actions require admin privileges.
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-lbl">Found</div>
+              <div class="stat-val c-blue" id="st-total">—</div>
+            </div>
+            <div class="stat">
+              <div class="stat-lbl">Blocked</div>
+              <div class="stat-val c-red" id="st-blocked">—</div>
+            </div>
+            <div class="stat">
+              <div class="stat-lbl">Online</div>
+              <div class="stat-val c-green" id="st-online">—</div>
+            </div>
+            <div class="stat">
+              <div class="stat-lbl">Gateway</div>
+              <div class="stat-val c-cyan" id="st-gw" style="font-size:18px">—</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-hd">
+              <div>
+                <div class="card-title">ARP Scan</div>
+                <div class="card-sub">Discover hosts and apply ARP block when needed</div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="fld">
+                <label class="lbl">Subnet CIDR</label>
+                <input id="inp-subnet" value="192.168.1.0/24" oninput="liveValidate()" />
+              </div>
+
+              <div class="fld">
+                <label class="lbl">Gateway IP</label>
+                <input id="inp-gw" placeholder="192.168.1.1" oninput="liveValidate()" />
+              </div>
+
+              <button class="primary" id="btn-scan" onclick="doScan()">Run scan</button>
+            </div>
+
+            <div class="help" id="val-fb"></div>
+            <div class="progress"><div class="progress-bar" id="prog"></div></div>
+            <div class="help" id="scan-st">Ready</div>
+          </div>
+
+
+
+          <div class="card">
+            <div class="card-hd">
+              <div>
+                <div class="card-title">Manual ARP MAC Block</div>
+                <div class="card-sub">Block a device directly by MAC address using ARP control</div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="fld">
+                <label class="lbl">Target MAC Address</label>
+                <input id="manual-mac" placeholder="AA:BB:CC:DD:EE:FF" oninput="manualBlockValidate()" />
+              </div>
+
+              <div class="fld">
+                <label class="lbl">Target IP Optional</label>
+                <input id="manual-ip" placeholder="192.168.1.50" oninput="manualBlockValidate()" />
+              </div>
+
+              <div class="fld">
+                <label class="lbl">Gateway IP</label>
+                <input id="manual-gw" placeholder="192.168.1.1" oninput="manualBlockValidate()" />
+              </div>
+
+              <button class="danger" id="btn-manual-block" onclick="manualBlockMac()">Block MAC</button>
+              <button class="ghost" id="btn-manual-unblock" onclick="manualUnblockMac()">Unblock MAC</button>
+            </div>
+
+            <div class="help" id="manual-block-fb" style="margin-top:12px">
+              Enter the device MAC address. Gateway is required for blocking; unblocking only needs the MAC.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-hd">
+              <div>
+                <div class="card-title">Discovered Devices</div>
+                <div class="card-sub">Current scan result</div>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>IP</th>
+                    <th>MAC</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="dev-tbody">
+                  <tr><td colspan="4" class="empty">No devices — run a scan.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PACKETS -->
+        <div class="panel" id="panel-packets">
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-lbl">Total Captured</div>
+              <div class="stat-val c-blue" id="pkt-total">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-lbl">Low</div>
+              <div class="stat-val c-green" id="pkt-low">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-lbl">Medium</div>
+              <div class="stat-val c-amber" id="pkt-med">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-lbl">High</div>
+              <div class="stat-val c-red" id="pkt-high">0</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-hd">
+              <div>
+                <div class="card-title">Live Packet Monitor</div>
+                <div class="card-sub">Filter captured packet buffer by protocol or risk</div>
+              </div>
+
+              <div class="mini-row">
+                <button class="ghost" onclick="loadPacketStats();loadPackets();renderDashboard()">Refresh</button>
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-bottom:14px">
+              <div class="fld">
+                <label class="lbl">Protocol</label>
+                <select id="pkt-proto" onchange="loadPackets()">
+                  <option value="">All</option>
+                  <option value="TCP">TCP</option>
+                  <option value="UDP">UDP</option>
+                  <option value="DNS">DNS</option>
+                  <option value="HTTP">HTTP</option>
+                  <option value="HTTPS">HTTPS</option>
+                  <option value="OTHER">OTHER</option>
+                </select>
+              </div>
+
+              <div class="fld">
+                <label class="lbl">Minimum Risk</label>
+                <select id="pkt-risk" onchange="loadPackets()">
+                  <option value="0">All</option>
+                  <option value="40">40+</option>
+                  <option value="70">70+</option>
+                </select>
+              </div>
+
+              <div class="fld">
+                <label class="lbl">Limit</label>
+                <select id="pkt-limit" onchange="loadPackets()">
+                  <option value="50">50</option>
+                  <option value="100" selected>100</option>
+                  <option value="250">250</option>
+                  <option value="500">500</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Source</th>
+                    <th>Destination</th>
+                    <th>Ports</th>
+                    <th>Proto</th>
+                    <th>Size</th>
+                    <th>Domain</th>
+                    <th>Risk</th>
+                    <th>Reason</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="pkt-tbody">
+                  <tr><td colspan="10" class="empty">No packets yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOC PROFILES -->
+        <div class="panel" id="panel-soc">
+          <div class="card">
+            <div class="card-hd">
+              <div>
+                <div class="card-title">Per-IP Traffic Profiles</div>
+                <div class="card-sub">Threat scoring, protocols, domains, destination IPs</div>
+              </div>
+
+              <button class="ghost" onclick="loadProfiles();renderDashboard()">Refresh</button>
+            </div>
+
+            <div class="form-row" style="margin-bottom:14px">
+              <div class="fld">
+                <label class="lbl">Minimum Avg Risk</label>
+                <select id="soc-risk" onchange="loadProfiles()">
+                  <option value="0">All</option>
+                  <option value="40">40+</option>
+                  <option value="70">70+</option>
+                </select>
+              </div>
+
+              <div class="fld">
+                <label class="lbl">Threat Level</label>
+                <select id="soc-level" onchange="loadProfiles()">
+                  <option value="">All</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>IP</th>
+                    <th>Packets</th>
+                    <th>Volume</th>
+                    <th>Protocols</th>
+                    <th>Domains</th>
+                    <th>Destinations</th>
+                    <th>Avg Risk</th>
+                    <th>Max Risk</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody id="soc-tbody">
+                  <tr><td colspan="10" class="empty">No profiles yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- REPORTS -->
+        <div class="panel" id="panel-reports">
+          <div class="grid2">
+            <div class="card">
+              <div class="card-hd">
+                <div>
+                  <div class="card-title">Generate Report</div>
+                  <div class="card-sub">Create an HTML security report now</div>
+                </div>
+              </div>
+
+              <button class="primary" onclick="generateReport()">Generate now</button>
+              <div class="help" id="report-status" style="margin-top:12px">No report generated in this session.</div>
+            </div>
+
+            <div class="card">
+              <div class="card-hd">
+                <div>
+                  <div class="card-title">Report Schedule</div>
+                  <div class="card-sub" id="dash-schedule">Loading schedule</div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="fld">
+                  <label class="lbl">Enabled</label>
+                  <select id="sched-enabled">
+                    <option value="true">Enabled</option>
+                    <option value="false">Disabled</option>
+                  </select>
+                </div>
+
+                <div class="fld">
+                  <label class="lbl">Interval Minutes</label>
+                  <input id="sched-min" type="number" min="5" max="10080" value="60" />
+                </div>
+
+                <button class="primary" onclick="saveSchedule()">Save</button>
+              </div>
+
+              <div class="help" id="sched-help" style="margin-top:12px">—</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-hd">
+              <div>
+                <div class="card-title">Generated Reports</div>
+                <div class="card-sub">Latest saved HTML reports</div>
+              </div>
+
+              <button class="ghost" onclick="loadReports()">Refresh</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Filename</th>
+                    <th>Size</th>
+                    <th>Open</th>
+                  </tr>
+                </thead>
+                <tbody id="reports-tbody">
+                  <tr><td colspan="3" class="empty">No reports generated yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- USERS -->
+        <div class="panel" id="panel-users">
+          <div class="grid2">
+            <div class="card">
+              <div class="card-hd">
+                <div>
+                  <div class="card-title">Create User</div>
+                  <div class="card-sub">Admin-only RBAC account creation</div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="fld">
+                  <label class="lbl">Username</label>
+                  <input id="user-new-name" placeholder="viewer_1" />
+                </div>
+                <div class="fld">
+                  <label class="lbl">Password</label>
+                  <input id="user-new-pass" type="password" placeholder="Minimum 8 characters" />
+                </div>
+                <div class="fld">
+                  <label class="lbl">Role</label>
+                  <select id="user-new-role">
+                    <option value="viewer">Viewer</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <button class="primary" onclick="createUser()">Create</button>
+              </div>
+              <div class="help" style="margin-top:12px">Viewer can inspect devices, logs, packets and reports. Admin can scan, block, unblock and manage users.</div>
+            </div>
+
+            <div class="card">
+              <div class="card-hd">
+                <div>
+                  <div class="card-title">Role Matrix</div>
+                  <div class="card-sub">Current backend permissions</div>
+                </div>
+              </div>
+              <div class="kpi-strip">
+                <span class="kpi-pill">admin: scan</span>
+                <span class="kpi-pill">admin: block/unblock</span>
+                <span class="kpi-pill">admin: manage users</span>
+                <span class="kpi-pill">viewer: read-only</span>
+                <span class="kpi-pill">both: reports/logs/packets</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-hd">
+              <div>
+                <div class="card-title">Users</div>
+                <div class="card-sub">Update role, reset password, or delete users</div>
+              </div>
+              <button class="ghost" onclick="loadUsers()">Refresh</button>
+            </div>
+            <div class="toolbar">
+              <input class="searchbox" id="user-search" placeholder="Search username or role..." oninput="renderUsers()" />
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Change Role</th>
+                    <th>Reset Password</th>
+                    <th>Delete</th>
+                  </tr>
+                </thead>
+                <tbody id="users-tbody">
+                  <tr><td colspan="5" class="empty">Loading users…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- LOGS -->
+        <div class="panel" id="panel-logs">
+          <div class="card">
+            <div class="card-hd">
+              <div>
+                <div class="card-title">Audit Log</div>
+                <div class="card-sub">Authentication, scans, blocks, report generation, denied access</div>
+              </div>
+
+              <button class="ghost" onclick="loadLogs()">Refresh</button>
+            </div>
+
+            <div id="log-list">
+              <div class="empty">Loading…</div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </section>
+  </div>
+</div>
+
+
+<div class="modal" id="profile-modal" onclick="closeProfileModal(event)">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div class="card-hd">
+      <div>
+        <div class="card-title" id="modal-title">Profile Details</div>
+        <div class="card-sub" id="modal-sub">Per-IP traffic intelligence</div>
+      </div>
+      <button class="ghost" onclick="closeProfileModal()">Close</button>
+    </div>
+    <div id="profile-detail-body"><div class="empty">Loading…</div></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let ROLE = "";
+let devices = [];
+let packets = [];
+let profiles = [];
+let users = [];
+let gwIp = "";
+let refreshTimer = null;
+
+const qs = id => document.getElementById(id);
+
+function esc(v) {
+  return String(v ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function timeOnly(ts) {
+  if (!ts) return "—";
+  return String(ts).slice(11, 19) || String(ts);
+}
+
+function fmtBytes(n) {
+  n = Number(n || 0);
+  if (n < 1024) return n + " B";
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
+  if (n < 1024 * 1024 * 1024) return (n / 1024 / 1024).toFixed(1) + " MB";
+  return (n / 1024 / 1024 / 1024).toFixed(1) + " GB";
+}
+
+function badge(level) {
+  const l = String(level || "low").toLowerCase();
+  const cls =
+    l === "high" || l === "danger" ? "b-high" :
+    l === "medium" || l === "warn" ? "b-medium" :
+    l === "blocked" ? "b-off" :
+    l === "online" || l === "active" ? "b-on" :
+    "b-low";
+
+  return `<span class="badge ${cls}">${esc(l)}</span>`;
+}
+
+function toast(msg, type = "ok") {
+  const t = qs("toast");
+  t.textContent = msg;
+  t.style.color = type === "err" ? "var(--red)" : type === "warn" ? "var(--amber)" : "var(--green)";
+  t.classList.add("on");
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("on"), 3000);
+}
+
+async function api(method, path, body) {
+  const opts = {
+    method,
+    headers: { "Content-Type": "application/json" },
+    credentials: "same-origin"
+  };
+
+  if (body !== undefined) opts.body = JSON.stringify(body);
+
+  try {
+    const r = await fetch(path, opts);
+    const data = await r.json().catch(() => ({}));
+
+    if (r.status === 401) {
+      showLogin();
+      return null;
+    }
+
+    return { ok: r.ok, status: r.status, data };
+  } catch (err) {
+    toast("Network error", "err");
+    return null;
+  }
+}
+
+/* AUTH */
+async function doLogin() {
+  const u = qs("lu").value.trim();
+  const p = qs("lp").value;
+  const err = qs("lerr");
+
+  err.textContent = "";
+
+  if (!u || !p) {
+    err.textContent = "All fields are required.";
+    return;
+  }
+
+  if (!/^[a-zA-Z0-9_]{1,32}$/.test(u)) {
+    err.textContent = "Invalid username format.";
+    return;
+  }
+
+  qs("login-btn").disabled = true;
+  qs("login-btn").innerHTML = '<span class="spinner"></span> Signing in';
+
+  const res = await api("POST", "/api/login", { username: u, password: p });
+
+  qs("login-btn").disabled = false;
+  qs("login-btn").textContent = "Sign in";
+
+  if (!res || !res.ok) {
+    err.textContent = res?.data?.error || "Login failed.";
+    return;
+  }
+
+  showApp(res.data.username, res.data.role);
+}
+
+async function doLogout() {
+  await api("POST", "/api/logout");
+  showLogin();
+}
+
+function showLogin() {
+  clearInterval(refreshTimer);
+  refreshTimer = null;
+
+  qs("app").style.display = "none";
+  qs("login").style.display = "flex";
+  qs("lp").value = "";
+
+  ROLE = "";
+  devices = [];
+  packets = [];
+  profiles = [];
+}
+
+async function showApp(username, role) {
+  ROLE = role;
+
+  qs("login").style.display = "none";
+  qs("app").style.display = "block";
+
+  qs("side-user").textContent = username;
+  qs("side-role").textContent = role;
+
+  qs("role-chip").textContent = role.toUpperCase();
+  qs("role-chip").className = "chip " + (role === "viewer" ? "viewer" : "");
+
+  qs("viewer-note").style.display = role === "admin" ? "none" : "block";
+  document.querySelectorAll(".admin-only").forEach(el => el.style.display = role === "admin" ? "flex" : "none");
+
+  const ni = await api("GET", "/api/netinfo");
+  if (ni?.ok) {
+    qs("side-iface").textContent = `${ni.data.iface} ${ni.data.ip}`;
+
+    if (!qs("inp-gw").value && ni.data.ip && ni.data.ip.includes(".")) {
+      const parts = ni.data.ip.split(".");
+      if (parts.length === 4) {
+        qs("inp-gw").value = parts.slice(0, 3).join(".") + ".1";
+        qs("manual-gw").value = qs("inp-gw").value;
+        liveValidate();
+        manualBlockValidate();
+      }
+    }
+  }
+
+  await refreshAll();
+
+  configureAutoRefresh();
+}
+
+/* NAV */
+function nav(el) {
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("on"));
+
+  el.classList.add("active");
+
+  const panel = el.dataset.panel;
+  qs("panel-" + panel).classList.add("on");
+
+  const titles = {
+    dashboard: ["Dashboard", "Security overview and live risk posture"],
+    devices: ["Devices", "ARP discovery and host blocking"],
+    packets: ["Live Packets", "Packet capture buffer and threat classification"],
+    soc: ["SOC Profiles", "Per-IP profiling and threat scoring"],
+    reports: ["Reports", "Manual and scheduled security reports"],
+    users: ["Users", "RBAC accounts and password reset"],
+    logs: ["Audit Log", "System events and access trail"]
+  };
+
+  qs("top-title").textContent = titles[panel][0];
+  qs("top-sub").textContent = titles[panel][1];
+
+  if (panel === "packets") {
+    loadPacketStats();
+    loadPackets();
+  }
+
+  if (panel === "soc") {
+    loadProfiles();
+  }
+
+  if (panel === "reports") {
+    loadReports();
+    loadSchedule();
+  }
+
+  if (panel === "users") {
+    loadUsers();
+  }
+
+  if (panel === "logs") {
+    loadLogs();
+  }
+}
+
+
+function configureAutoRefresh() {
+  clearInterval(refreshTimer);
+  refreshTimer = null;
+  const ms = Number(qs("auto-refresh")?.value || 0);
+  if (!ms) {
+    toast("Auto refresh disabled", "warn");
+    return;
+  }
+  refreshTimer = setInterval(async () => {
+    await loadPacketStats();
+    await loadPackets();
+    await loadProfiles();
+    await loadRecommendations();
+    renderDashboard();
+  }, ms);
+  toast(`Auto refresh every ${Math.round(ms / 1000)}s`);
+}
+
+/* REFRESH */
+async function refreshAll() {
+  await loadPacketStats();
+  await loadPackets();
+  await loadProfiles();
+  await loadRecommendations();
+  await loadReports();
+  await loadSchedule();
+  if (ROLE === "admin") await loadUsers();
+  await loadLogs();
+  renderDashboard();
+}
+
+/* PACKET STATS */
+async function loadPacketStats() {
+  const res = await api("GET", "/api/packets/stats");
+  if (!res?.ok) return;
+
+  const s = res.data;
+  const r = s.risk_distribution || {};
+  const proto = s.proto_breakdown || {};
+
+  qs("pkt-total").textContent = s.total_captured ?? 0;
+  qs("pkt-low").textContent = r.low ?? 0;
+  qs("pkt-med").textContent = r.medium ?? 0;
+  qs("pkt-high").textContent = r.high ?? 0;
+
+  qs("dash-captured").textContent = s.total_captured ?? 0;
+  qs("dash-high").textContent = r.high ?? 0;
+  qs("dash-med").textContent = r.medium ?? 0;
+  qs("dash-bytes").textContent = fmtBytes(s.total_bytes);
+
+  qs("side-sniffer").textContent = s.sniffer_running ? "running" : "stopped";
+  qs("dash-sniffer").textContent = s.sniffer_running ? "Packet sniffer is running" : "Packet sniffer is not running";
+  qs("nav-pkt-count").textContent = s.total_captured ?? 0;
+
+  qs("dash-protos").innerHTML = Object.keys(proto).length
+    ? Object.entries(proto).map(([k, v]) => `${esc(k)}: <b>${v}</b>`).join(" · ")
+    : "No protocols captured yet";
+}
+
+/* VALIDATION */
+function validCIDR(v) {
+  if (!/^(\d{1,3}\.){3}\d{1,3}\/([0-9]|[12][0-9]|3[0-2])$/.test(v)) return false;
+  return v.split("/")[0].split(".").every(n => +n >= 0 && +n <= 255);
+}
+
+function validIP(v) {
+  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(v)) return false;
+  return v.split(".").every(n => +n >= 0 && +n <= 255);
+}
+
+function liveValidate() {
+  const subnet = qs("inp-subnet").value.trim();
+  const gw = qs("inp-gw").value.trim();
+
+  const subnetOk = validCIDR(subnet);
+  const gwOk = !gw || validIP(gw);
+
+  qs("inp-subnet").style.borderColor = subnet && !subnetOk ? "var(--red)" : "";
+  qs("inp-gw").style.borderColor = gw && !gwOk ? "var(--red)" : "";
+
+  if (subnet && !subnetOk) {
+    qs("val-fb").innerHTML = '<span class="c-red">Invalid CIDR. Example: 192.168.1.0/24</span>';
+  } else if (gw && !gwOk) {
+    qs("val-fb").innerHTML = '<span class="c-red">Invalid gateway IP.</span>';
+  } else if (subnetOk) {
+    qs("val-fb").innerHTML = `<span class="c-green">Valid subnet: ${esc(subnet)}</span>`;
+  } else {
+    qs("val-fb").textContent = "";
+  }
+
+  gwIp = gw;
+  qs("st-gw").textContent = gw || "—";
+  if (qs("manual-gw") && !qs("manual-gw").value.trim() && gw) qs("manual-gw").value = gw;
+}
+
+
+function validMAC(v) {
+  return /^([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2})$/.test(String(v || "").trim());
+}
+
+function normalizeMAC(v) {
+  return String(v || "").trim().replaceAll("-", ":").toUpperCase();
+}
+
+function manualBlockValidate() {
+  const mac = qs("manual-mac")?.value.trim() || "";
+  const ip = qs("manual-ip")?.value.trim() || "";
+  const gw = qs("manual-gw")?.value.trim() || "";
+  const fb = qs("manual-block-fb");
+
+  if (!fb) return false;
+
+  const macOk = !mac || validMAC(mac);
+  const ipOk = !ip || validIP(ip);
+  const gwOk = !gw || validIP(gw);
+
+  qs("manual-mac").style.borderColor = mac && !macOk ? "var(--red)" : "";
+  qs("manual-ip").style.borderColor = ip && !ipOk ? "var(--red)" : "";
+  qs("manual-gw").style.borderColor = gw && !gwOk ? "var(--red)" : "";
+
+  if (mac && !macOk) {
+    fb.innerHTML = '<span class="c-red">Invalid MAC. Example: AA:BB:CC:DD:EE:FF</span>';
+    return false;
+  }
+
+  if (ip && !ipOk) {
+    fb.innerHTML = '<span class="c-red">Invalid target IP.</span>';
+    return false;
+  }
+
+  if (gw && !gwOk) {
+    fb.innerHTML = '<span class="c-red">Invalid gateway IP.</span>';
+    return false;
+  }
+
+  if (macOk && mac) {
+    fb.innerHTML = `<span class="c-green">Ready for MAC: ${esc(normalizeMAC(mac))}</span>`;
+    return true;
+  }
+
+  fb.textContent = "Enter the device MAC address. Gateway is required for blocking; unblocking only needs the MAC.";
+  return false;
+}
+
+async function manualBlockMac() {
+  if (ROLE !== "admin") {
+    toast("Admin permission required to block MAC", "err");
+    return;
+  }
+
+  const mac = normalizeMAC(qs("manual-mac").value);
+  const ip = qs("manual-ip").value.trim();
+  const gw = qs("manual-gw").value.trim() || qs("inp-gw").value.trim();
+
+  if (!validMAC(mac)) {
+    toast("Enter a valid MAC address", "err");
+    manualBlockValidate();
+    return;
+  }
+
+  if (ip && !validIP(ip)) {
+    toast("Invalid target IP", "err");
+    manualBlockValidate();
+    return;
+  }
+
+  if (!validIP(gw)) {
+    toast("Enter a valid gateway IP", "err");
+    manualBlockValidate();
+    return;
+  }
+
+  const payload = { mac, gateway: gw };
+  if (ip) payload.ip = ip;
+
+  const res = await api("POST", "/api/block", payload);
+
+  if (!res?.ok) {
+    toast(res?.data?.error || "MAC block failed", "err");
+    return;
+  }
+
+  devices = devices.map(d => normalizeMAC(d.mac) === mac ? { ...d, blocked: true } : d);
+  renderDevices();
+  qs("manual-block-fb").innerHTML = `<span class="c-amber">Blocked MAC: ${esc(mac)}</span>`;
+  toast(`Blocked MAC ${mac}`, "warn");
+  loadLogs();
+  loadProfiles();
+}
+
+async function manualUnblockMac() {
+  if (ROLE !== "admin") {
+    toast("Admin permission required to unblock MAC", "err");
+    return;
+  }
+
+  const mac = normalizeMAC(qs("manual-mac").value);
+
+  if (!validMAC(mac)) {
+    toast("Enter a valid MAC address", "err");
+    manualBlockValidate();
+    return;
+  }
+
+  const res = await api("POST", "/api/unblock", { mac });
+
+  if (!res?.ok) {
+    toast(res?.data?.error || "MAC unblock failed", "err");
+    return;
+  }
+
+  devices = devices.map(d => normalizeMAC(d.mac) === mac ? { ...d, blocked: false } : d);
+  renderDevices();
+  qs("manual-block-fb").innerHTML = `<span class="c-green">Unblocked MAC: ${esc(mac)}</span>`;
+  toast(`Unblocked MAC ${mac}`);
+  loadLogs();
+  loadProfiles();
+}
+
+/* SCAN / DEVICES */
+async function doScan() {
+  if (ROLE !== "admin") {
+    toast("Admin permission required to scan", "err");
+    return;
+  }
+
+  const subnet = qs("inp-subnet").value.trim();
+  const gw = qs("inp-gw").value.trim();
+
+  if (!validCIDR(subnet)) {
+    toast("Invalid subnet", "err");
+    return;
+  }
+
+  if (!validIP(gw)) {
+    toast("Enter a valid gateway IP", "err");
+    return;
+  }
+
+  gwIp = gw;
+  qs("st-gw").textContent = gw;
+
+  const btn = qs("btn-scan");
+  const bar = qs("prog");
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Scanning';
+  qs("scan-st").textContent = "Scanning subnet…";
+
+  let pct = 0;
+  const iv = setInterval(() => {
+    pct = Math.min(92, pct + 3);
+    bar.style.width = pct + "%";
+  }, 100);
+
+  const res = await api("POST", "/api/scan", { subnet });
+
+  clearInterval(iv);
+  bar.style.width = "100%";
+  btn.disabled = false;
+  btn.textContent = "Run scan";
+
+  if (!res?.ok) {
+    qs("scan-st").textContent = res?.data?.error || "Scan failed";
+    toast(res?.data?.error || "Scan failed", "err");
+    setTimeout(() => bar.style.width = "0", 900);
+    return;
+  }
+
+  devices = res.data.devices || [];
+  qs("scan-st").textContent = `Found ${devices.length} device(s) on ${subnet} via ${res.data.iface}`;
+
+  renderDevices();
+  toast("Scan complete");
+
+  setTimeout(() => bar.style.width = "0", 900);
+  loadLogs();
+}
+
+function renderDevices() {
+  const blocked = devices.filter(d => d.blocked).length;
+
+  qs("st-total").textContent = devices.length;
+  qs("st-blocked").textContent = blocked;
+  qs("st-online").textContent = devices.length - blocked;
+  qs("nav-dev-count").textContent = devices.length || "—";
+
+  if (!devices.length) {
+    qs("dev-tbody").innerHTML = '<tr><td colspan="4" class="empty">No devices — run a scan.</td></tr>';
+    return;
+  }
+
+  qs("dev-tbody").innerHTML = devices.map((d, i) => `
+    <tr>
+      <td>${esc(d.ip)}</td>
+      <td>${esc(d.mac)}</td>
+      <td>${d.blocked ? '<span class="badge b-off">blocked</span>' : '<span class="badge b-on">online</span>'}</td>
+      <td>
+        ${
+          ROLE === "admin"
+            ? d.blocked
+              ? `<button class="ghost" onclick="doUnblock(${i})">Unblock</button>`
+              : `<button class="danger" onclick="doBlock(${i})">Block</button>`
+            : '<span class="muted">view only</span>'
+        }
+      </td>
+    </tr>
+  `).join("");
+}
+
+async function doBlock(i) {
+  const d = devices[i];
+
+  if (!gwIp || !validIP(gwIp)) {
+    toast("Set a valid gateway IP before blocking", "warn");
+    return;
+  }
+
+  const res = await api("POST", "/api/block", {
+    ip: d.ip,
+    mac: d.mac,
+    gateway: gwIp
+  });
+
+  if (!res?.ok) {
+    toast(res?.data?.error || "Block failed", "err");
+    return;
+  }
+
+  devices[i].blocked = true;
+  renderDevices();
+  toast(`Blocked ${d.ip}`, "warn");
+  loadLogs();
+  loadProfiles();
+}
+
+async function doUnblock(i) {
+  const d = devices[i];
+
+  const res = await api("POST", "/api/unblock", {
+    mac: d.mac
+  });
+
+  if (!res?.ok) {
+    toast(res?.data?.error || "Unblock failed", "err");
+    return;
+  }
+
+  devices[i].blocked = false;
+  renderDevices();
+  toast(`Unblocked ${d.ip}`);
+  loadLogs();
+  loadProfiles();
+}
+
+/* PACKETS */
+async function loadPackets() {
+  const proto = qs("pkt-proto")?.value || "";
+  const risk = qs("pkt-risk")?.value || 0;
+  const limit = qs("pkt-limit")?.value || 100;
+
+  const path = `/api/packets?limit=${encodeURIComponent(limit)}&proto=${encodeURIComponent(proto)}&min_risk=${encodeURIComponent(risk)}`;
+  const res = await api("GET", path);
+
+  if (!res?.ok) return;
+
+  packets = res.data.packets || [];
+  renderPackets();
+}
+
+function renderPackets() {
+  if (!packets.length) {
+    qs("pkt-tbody").innerHTML = '<tr><td colspan="10" class="empty">No packets match current filters.</td></tr>';
+    return;
+  }
+
+  qs("pkt-tbody").innerHTML = packets.map(p => {
+    const riskWidth = Math.max(0, Math.min(100, p.risk || 0));
+
+    return `
+      <tr>
+        <td>${timeOnly(p.ts)}</td>
+        <td>${esc(p.src)}</td>
+        <td>${esc(p.dst)}</td>
+        <td>${esc(p.sport)} → ${esc(p.dport)}</td>
+        <td>${esc(p.proto)}</td>
+        <td>${fmtBytes(p.size)}</td>
+        <td>${esc(p.domain || "—")}</td>
+        <td>
+          <div class="mini-row">
+            ${badge(p.label)}
+            <div class="riskbar"><span style="width:${riskWidth}%"></span></div>
+            <b>${p.risk}%</b>
+          </div>
+        </td>
+        <td>${esc(p.reason)}</td>
+        <td><button class="ghost" onclick="copyPacket('${p.id}')">Copy</button></td>
+      </tr>
+    `;
+  }).join("");
+}
+
+/* SOC PROFILES */
+async function loadProfiles() {
+  const min = qs("soc-risk")?.value || 0;
+  const level = qs("soc-level")?.value || "";
+
+  const res = await api("GET", `/api/soc/profiles?min_risk=${encodeURIComponent(min)}&threat_level=${encodeURIComponent(level)}`);
+
+  if (!res?.ok) return;
+
+  profiles = res.data.profiles || [];
+  qs("nav-soc-count").textContent = res.data.total ?? profiles.length;
+
+  renderProfiles();
+}
+
+function renderProfiles() {
+  if (!profiles.length) {
+    qs("soc-tbody").innerHTML = '<tr><td colspan="10" class="empty">No profiles yet. Wait for traffic capture.</td></tr>';
+    return;
+  }
+
+  qs("soc-tbody").innerHTML = profiles.map(p => {
+    const protocols = Object.entries(p.protocols || {})
+      .slice(0, 4)
+      .map(([k, v]) => `${esc(k)}:${v}`)
+      .join(" · ") || "—";
+
+    return `
+      <tr>
+        <td>${esc(p.ip)}</td>
+        <td>${p.pkt_count}</td>
+        <td>${fmtBytes(p.bytes_total)}</td>
+        <td>${protocols}</td>
+        <td>${esc((p.domains || []).slice(0, 3).join(", ") || "—")}</td>
+        <td>${esc((p.dst_ips || []).slice(0, 3).join(", ") || "—")}</td>
+        <td>
+          <div class="mini-row">
+            ${badge(p.threat_level)}
+            <div class="riskbar"><span style="width:${p.avg_risk}%"></span></div>
+            <b>${p.avg_risk}%</b>
+          </div>
+        </td>
+        <td>${p.max_risk}%</td>
+        <td>${p.blocked ? '<span class="badge b-off">blocked</span>' : '<span class="badge b-on">active</span>'}</td>
+        <td><button class="bluebtn" onclick="openProfileDetail('${p.ip}')">Details</button></td>
+      </tr>
+    `;
+  }).join("");
+}
+
+async function loadRecommendations() {
+  const res = await api("GET", "/api/soc/recommendations");
+  if (!res?.ok) return;
+
+  const recs = res.data.recommendations || [];
+
+  qs("rec-list").innerHTML = recs.length
+    ? recs.map(r => `<div class="rec">${esc(r)}</div>`).join("")
+    : '<div class="empty">No recommendations yet.</div>';
+}
+
+/* REPORTS */
+async function loadReports() {
+  const res = await api("GET", "/api/reports");
+  if (!res?.ok) return;
+
+  const rows = res.data.reports || [];
+
+  qs("reports-tbody").innerHTML = rows.length
+    ? rows.map(r => `
+      <tr>
+        <td>${esc(r.filename)}</td>
+        <td>${esc(r.size_kb)} KB</td>
+        <td>
+          <a class="bluebtn" href="${esc(r.url)}" target="_blank" rel="noopener" style="text-decoration:none">Open</a>
+        </td>
+      </tr>
+    `).join("")
+    : '<tr><td colspan="3" class="empty">No reports generated yet.</td></tr>';
+}
+
+async function generateReport() {
+  qs("report-status").innerHTML = '<span class="spinner"></span> Generating report…';
+
+  const res = await api("POST", "/api/reports/generate", {});
+
+  if (!res?.ok) {
+    qs("report-status").textContent = res?.data?.error || "Report generation failed";
+    toast("Report generation failed", "err");
+    return;
+  }
+
+  qs("report-status").innerHTML = `
+    Generated:
+    <a class="c-blue" href="${esc(res.data.url)}" target="_blank">${esc(res.data.filename)}</a>
+  `;
+
+  toast("Report generated");
+  loadReports();
+  loadLogs();
+}
+
+async function loadSchedule() {
+  const res = await api("GET", "/api/reports/schedule");
+  if (!res?.ok) return;
+
+  qs("sched-enabled").value = String(!!res.data.enabled);
+  qs("sched-min").value = res.data.interval_minutes || 60;
+
+  qs("sched-help").textContent = res.data.enabled
+    ? `Enabled: every ${res.data.interval_minutes} minute(s)`
+    : "Disabled";
+
+  qs("dash-schedule").textContent = res.data.enabled
+    ? `Automated reports every ${res.data.interval_minutes} minute(s)`
+    : "Automated reports disabled";
+}
+
+async function saveSchedule() {
+  const enabled = qs("sched-enabled").value === "true";
+  const interval_minutes = Number(qs("sched-min").value);
+
+  const res = await api("POST", "/api/reports/schedule", {
+    enabled,
+    interval_minutes
+  });
+
+  if (!res?.ok) {
+    toast(res?.data?.error || "Schedule update failed", "err");
+    return;
+  }
+
+  toast("Schedule updated");
+  loadSchedule();
+  loadLogs();
+}
+
+
+function copyPacket(id) {
+  const pkt = packets.find(p => p.id === id);
+  if (!pkt) return;
+  navigator.clipboard?.writeText(JSON.stringify(pkt, null, 2));
+  toast("Packet JSON copied");
+}
+
+async function openProfileDetail(ip) {
+  qs("profile-modal").classList.add("on");
+  qs("modal-title").textContent = `Profile: ${ip}`;
+  qs("profile-detail-body").innerHTML = '<div class="empty">Loading profile details…</div>';
+
+  const res = await api("GET", `/api/soc/profiles/${encodeURIComponent(ip)}`);
+  if (!res?.ok) {
+    qs("profile-detail-body").innerHTML = `<div class="notice">${esc(res?.data?.error || "Profile not found")}</div>`;
+    return;
+  }
+
+  const p = res.data;
+  const protocols = Object.entries(p.protocols || {}).map(([k, v]) => `${esc(k)}: ${v}`).join(" · ") || "—";
+  qs("profile-detail-body").innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-box"><small>IP</small><b>${esc(p.ip)}</b></div>
+      <div class="detail-box"><small>Status</small><b>${p.blocked ? "Blocked" : "Active"}</b></div>
+      <div class="detail-box"><small>Packets</small><b>${p.pkt_count}</b></div>
+      <div class="detail-box"><small>Traffic Volume</small><b>${fmtBytes(p.bytes_total)}</b></div>
+      <div class="detail-box"><small>Average Risk</small><b>${p.avg_risk}%</b></div>
+      <div class="detail-box"><small>Max Risk</small><b>${p.max_risk}%</b></div>
+      <div class="detail-box"><small>First Seen</small><b>${esc(p.first_seen || "—")}</b></div>
+      <div class="detail-box"><small>Last Seen</small><b>${esc(p.last_seen || "—")}</b></div>
+    </div>
+    <div class="card" style="margin-top:14px;margin-bottom:0">
+      <div class="card-title">Protocols</div>
+      <div class="help" style="margin-top:8px">${protocols}</div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card" style="margin-bottom:0">
+        <div class="card-title">Domains</div>
+        <div class="help" style="margin-top:8px">${esc((p.domains || []).join(", ") || "—")}</div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div class="card-title">Destination IPs</div>
+        <div class="help" style="margin-top:8px">${esc((p.dst_ips || []).join(", ") || "—")}</div>
+      </div>
+    </div>`;
+}
+
+function closeProfileModal(ev) {
+  if (ev && ev.target && ev.target.id !== "profile-modal") return;
+  qs("profile-modal").classList.remove("on");
+}
+
+/* USERS */
+async function loadUsers() {
+  if (ROLE !== "admin") return;
+  const res = await api("GET", "/api/users");
+  if (!res?.ok) return;
+  users = res.data.users || [];
+  qs("nav-user-count").textContent = users.length || "—";
+  renderUsers();
+}
+
+function renderUsers() {
+  const q = (qs("user-search")?.value || "").trim().toLowerCase();
+  const rows = users.filter(u => !q || u.username.toLowerCase().includes(q) || u.role.toLowerCase().includes(q));
+
+  if (!rows.length) {
+    qs("users-tbody").innerHTML = '<tr><td colspan="5" class="empty">No users found.</td></tr>';
+    return;
+  }
+
+  qs("users-tbody").innerHTML = rows.map(u => `
+    <tr>
+      <td>${esc(u.username)}</td>
+      <td>${badge(u.role === "admin" ? "medium" : "low")} ${esc(u.role)}</td>
+      <td>
+        <select id="role-${esc(u.username)}" ${u.username === qs("side-user").textContent ? "disabled" : ""}>
+          <option value="viewer" ${u.role === "viewer" ? "selected" : ""}>viewer</option>
+          <option value="admin" ${u.role === "admin" ? "selected" : ""}>admin</option>
+        </select>
+        <button class="ghost" onclick="updateUserRole('${esc(u.username)}')">Save</button>
+      </td>
+      <td>
+        <input id="pass-${esc(u.username)}" placeholder="new password" type="password" style="max-width:180px" />
+        <button class="warn" onclick="resetUserPassword('${esc(u.username)}')">Reset</button>
+      </td>
+      <td>
+        ${u.username === qs("side-user").textContent ? '<span class="muted">current user</span>' : `<button class="danger" onclick="deleteUser('${esc(u.username)}')">Delete</button>`}
+      </td>
+    </tr>
+  `).join("");
+}
+
+async function createUser() {
+  const username = qs("user-new-name").value.trim();
+  const password = qs("user-new-pass").value;
+  const role = qs("user-new-role").value;
+  const res = await api("POST", "/api/users", { username, password, role });
+  if (!res?.ok) {
+    toast(res?.data?.error || "User creation failed", "err");
+    return;
+  }
+  qs("user-new-name").value = "";
+  qs("user-new-pass").value = "";
+  toast("User created");
+  loadUsers();
+  loadLogs();
+}
+
+async function updateUserRole(username) {
+  const role = qs(`role-${username}`).value;
+  const res = await api("PUT", `/api/users/${encodeURIComponent(username)}`, { role });
+  if (!res?.ok) {
+    toast(res?.data?.error || "Role update failed", "err");
+    return;
+  }
+  toast("Role updated");
+  loadUsers();
+  loadLogs();
+}
+
+async function resetUserPassword(username) {
+  const password = qs(`pass-${username}`).value;
+  const res = await api("PUT", `/api/users/${encodeURIComponent(username)}`, { password });
+  if (!res?.ok) {
+    toast(res?.data?.error || "Password reset failed", "err");
+    return;
+  }
+  toast("Password reset");
+  loadUsers();
+  loadLogs();
+}
+
+async function deleteUser(username) {
+  if (!confirm(`Delete user ${username}?`)) return;
+  const res = await api("DELETE", `/api/users/${encodeURIComponent(username)}`);
+  if (!res?.ok) {
+    toast(res?.data?.error || "Delete failed", "err");
+    return;
+  }
+  toast("User deleted", "warn");
+  loadUsers();
+  loadLogs();
+}
+
+/* LOGS */
+async function loadLogs() {
+  const res = await api("GET", "/api/logs");
+  if (!res?.ok) return;
+
+  const logs = res.data.logs || [];
+
+  qs("log-list").innerHTML = logs.length
+    ? logs.map(e => `
+      <div class="log-row">
+        <span class="muted">${timeOnly(e.ts)}</span>
+        <span>${badge(e.level === "warn" ? "medium" : e.level === "danger" ? "high" : "low")}</span>
+        <span>${esc(e.action)} — ${esc(e.detail)}</span>
+        <span class="muted">${esc(e.user)}</span>
+      </div>
+    `).join("")
+    : '<div class="empty">No events yet.</div>';
+}
+
+/* DASHBOARD */
+function renderDashboard() {
+  const topHosts = [...profiles]
+    .sort((a, b) => (b.avg_risk || 0) - (a.avg_risk || 0))
+    .slice(0, 6);
+
+  qs("dash-hosts").innerHTML = topHosts.length
+    ? topHosts.map(p => `
+      <tr>
+        <td>${esc(p.ip)}</td>
+        <td>${p.pkt_count}</td>
+        <td>
+          <div class="mini-row">
+            <div class="riskbar"><span style="width:${p.avg_risk}%"></span></div>
+            <b>${p.avg_risk}%</b>
+          </div>
+        </td>
+        <td>${badge(p.threat_level)}</td>
+      </tr>
+    `).join("")
+    : '<tr><td colspan="4" class="empty">No profiles yet.</td></tr>';
+
+  const suspiciousPackets = [...packets]
+    .sort((a, b) => (b.risk || 0) - (a.risk || 0))
+    .slice(0, 8);
+
+  qs("dash-packets").innerHTML = suspiciousPackets.length
+    ? suspiciousPackets.map(p => `
+      <tr>
+        <td>${timeOnly(p.ts)}</td>
+        <td>${esc(p.src)}</td>
+        <td>${esc(p.dst)}</td>
+        <td>${esc(p.proto)}</td>
+        <td>${badge(p.label)} ${p.risk}%</td>
+      </tr>
+    `).join("")
+    : '<tr><td colspan="5" class="empty">No packets yet.</td></tr>';
+}
+
+/* INIT */
+qs("lp").addEventListener("keydown", e => {
+  if (e.key === "Enter") doLogin();
+});
+
+qs("lu").addEventListener("keydown", e => {
+  if (e.key === "Enter") doLogin();
+});
+
+(async () => {
+  const res = await api("GET", "/api/me");
+  if (res?.ok) {
+    showApp(res.data.username, res.data.role);
+  }
+})();
+</script>
+</body>
+</html>
