@@ -12,7 +12,13 @@ sudo python app.py
 
 Open http://localhost:5000
 
-Default login: admin / Admin@1234
+First run creates the `admin` account. Set `NETGUARD_ADMIN_PASSWORD` before starting to choose its password, or let NetGuard generate one and print it once in the terminal:
+
+```bash
+NETGUARD_ADMIN_PASSWORD='choose-a-strong-one' sudo -E python app.py
+```
+
+There is no fixed default password. Use it only on networks you own or are authorized to test: blocking a device sends ARP spoofing packets to it.
 
 ## Secure Programming Concepts
 

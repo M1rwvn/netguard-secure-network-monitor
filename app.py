@@ -90,8 +90,10 @@ def save_data(data: dict):
         f.write(encrypted)
     os.chmod(STORAGE_FILE, 0o600)
 
-def _default_data() -> dict:
-    admin_pw = "Admin@1234"
+def _default_data(admin_pw: str = None) -> dict:
+    # No fixed default password. A fallback call without one gets a random,
+    # unknown password, so nobody can log in until first-run setup creates the account.
+    admin_pw = admin_pw or secrets.token_urlsafe(24)
     hashed   = bcrypt.hashpw(admin_pw.encode(), bcrypt.gensalt(rounds=12)).decode()
     return {
         "users":           {"admin": {"hash": hashed, "role": "admin"}},
@@ -866,8 +868,13 @@ if __name__ == "__main__":
         print("[!] Must run as root for ARP/sniff operations: sudo python app.py")
         sys.exit(1)
     if not os.path.exists(STORAGE_FILE):
-        save_data(_default_data())
-        print("[+] Storage initialized (admin / Admin@1234)")
+        # First run: no fixed default password. Use NETGUARD_ADMIN_PASSWORD if set,
+        # otherwise generate a random one and show it once.
+        first_pw = os.environ.get("NETGUARD_ADMIN_PASSWORD") or secrets.token_urlsafe(12)
+        save_data(_default_data(first_pw))
+        print("[+] Storage initialized. Login: admin")
+        if not os.environ.get("NETGUARD_ADMIN_PASSWORD"):
+            print(f"[+] Generated admin password (shown once): {first_pw}")
     iface, ip = detect_interface()
     print(f"[+] Interface : {iface}  IP: {ip}")
     print(f"[+] Storage   : {STORAGE_FILE} (Fernet-encrypted)")

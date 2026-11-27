@@ -1,0 +1,4 @@
+data.enc
+storage.key
+__pycache__/
+.venv/
