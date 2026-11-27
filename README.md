@@ -67,3 +67,5 @@ Every sensitive action is appended to the encrypted audit log:
 - Block / unblock events
 - Access denied events
 Each entry includes: timestamp, level, user, action, detail, source IP.
+
+By default the dashboard listens on 127.0.0.1 only. Set `NETGUARD_HOST=0.0.0.0` to expose it to your network (use a strong admin password).

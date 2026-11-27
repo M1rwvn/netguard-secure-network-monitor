@@ -880,5 +880,5 @@ if __name__ == "__main__":
     print(f"[+] Storage   : {STORAGE_FILE} (Fernet-encrypted)")
     start_sniffer()           # [NEW] live packet capture
     start_report_scheduler()  # [NEW] periodic HTML reports
-    print("[+] Running at http://0.0.0.0:5000")
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    print(f"[+] Running at http://{os.environ.get('NETGUARD_HOST', '127.0.0.1')}:5000")
+    app.run(host=os.environ.get("NETGUARD_HOST", "127.0.0.1"), port=5000, debug=False)
