@@ -69,3 +69,11 @@ Every sensitive action is appended to the encrypted audit log:
 Each entry includes: timestamp, level, user, action, detail, source IP.
 
 By default the dashboard listens on 127.0.0.1 only. Set `NETGUARD_HOST=0.0.0.0` to expose it to your network (use a strong admin password).
+
+## Screenshots
+
+From actually running `app.py` (in an environment without root, so ARP scanning and packet capture were off - the dashboard itself says "Packet sniffer is not running"):
+
+![The NetGuard sign-in page](docs/screenshots/netguard-login.png)
+
+![The SOC dashboard logged in as admin: the interface is detected, all counters read zero because the sniffer needs root, and the SOC Recommendations panel says so](docs/screenshots/netguard-dashboard.png)
